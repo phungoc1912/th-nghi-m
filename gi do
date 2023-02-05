@@ -1,0 +1,154 @@
+#include <Wire.h>
+#include <U8glib.h>
+#include <BH1750.h>
+#include <DHT.h>
+#include <RTClib.h>
+#include <PS2Keyboard.h>
+
+U8GLIB_SSD1306_128X64 u8g(U8G_I2C_OPT_NONE);
+BH1750 lightSensor;
+DHT dht(2, DHT11);
+RTC_DS1307 rtc;
+PS2Keyboard keyboard;
+
+enum SettingType {
+  NONE,
+  DAY,
+  MONTH,
+  HOUR,
+  MINUTE,
+  SECOND
+};
+
+SettingType currentSetting = NONE;
+int settingValue = 0;
+
+void setup() {
+  Serial.begin(9600);
+  Wire.begin();
+  
+  u8g.begin();
+  lightSensor.begin();
+  dht.begin();
+  rtc.begin();
+  
+  keyboard.begin(0);
+}
+
+void displayTimeSettingScreen() {
+  u8g.firstPage();
+  do {
+    u8g.setFont(u8g_font_unifont);
+    u8g.drawStr(0, 20, "Time Setting");
+    u8g.drawStr(0, 40, "Day: " + String(settingValue));
+    u8g.drawStr(0, 60, "Month: " + String(settingValue));
+    u8g.drawStr(0, 80, "Hour: " + String(settingValue));
+    u8g.drawStr(0, 100, "Minute: " + String(settingValue));
+    u8g.drawStr(0, 120, "Second: " + String(settingValue));
+  } while ( u8g.nextPage() );
+}
+
+void loop() {
+  if (keyboard.available()) {
+    int key = keyboard.read();
+    switch (key) {
+      case PS2_UP:
+        settingValue++;
+        break;
+      case PS2_DOWN:
+        settingValue--;
+        break;
+      case PS2_BUTTON:
+        switch (currentSetting) {
+          case DAY:
+            rtc.adjust(DateTime(2000, 1, settingValue, 0, 0, 0));
+            break;
+          case MONTH:
+            rtc.adjust(DateTime(2000, settingValue, 1, 0, 0, 0));
+            break;
+          case HOUR:
+            rtc.adjust(DateTime(2000, 1, 1, settingValue, 0, 0));
+            break;
+          case MINUTE:
+            rtc.adjust(DateTime(2000, 1, 1, 0, settingValue, 0));
+            break;
+          case SECOND:
+            rtc.adjust(DateTime(2000, 1, 1, 0, 0, settingValue));
+            break;
+          default:
+            break;
+        }
+        currentSetting = (SettingType)((int)currentSetting + 1);
+        if (currentSetting > SECOND) {
+          currentSetting = NONE;
+        }
+        break;
+      default:
+       
+void displayExplosion() {
+  u8g.firstPage();
+  do {
+    u8g.setFont(u8g_font_unifont);
+    u8g.drawStr(20, 30, "Planet Exploding");
+    u8g.drawCircle(64, 50, 30);
+    u8g.drawCircle(54, 60, 10);
+    u8g.drawCircle(74, 60, 10);
+  } while ( u8g.nextPage() );
+  delay(1000);
+
+  u8g.firstPage();
+  do {
+    u8g.setFont(u8g_font_unifont);
+    u8g.drawStr(20, 30, "Spaceship Rising");
+    u8g.drawRBox(50, 50, 28, 18, 5);
+    u8g.drawTriangle(58, 60, 70, 60, 64, 50);
+  } while ( u8g.nextPage() );
+  delay(1000);
+
+  u8g.firstPage();
+  do {
+    u8g.setFont(u8g_font_unifont);
+    u8g.drawStr(20, 30, "Human Beings");
+    u8g.drawCircle(64, 50, 10);
+    u8g.drawVLine(64, 40, 60);
+    u8g.drawHLine(54, 55, 74);
+  } while ( u8g.nextPage() );
+  delay(1000);
+
+  u8g.firstPage();
+  do {
+    u8g.setFont(u8g_font_unifont);
+    u8g.drawStr(20, 30, "Spaceship Crashed");
+    u8g.drawRBox(50, 50, 28, 18, 5);
+    u8g.drawTriangle(58, 60, 70, 60, 64, 50);
+    u8g.drawCircle(64, 70, 20);
+  } while ( u8g.nextPage() );
+  delay(1000);
+
+  u8g.firstPage();
+  do {
+    u8g.setFont(u8g_font_unifont);
+    u8g.drawStr(20, 30, "Egg Jumped Out");
+    u8g.drawEllipse(64, 50, 20, 15);
+    u8g.drawLine(64, 35, 64, 65);
+  } while ( u8g.nextPage() );
+  delay(1000);
+
+  u8g.firstPage();
+  do {
+    u8g.setFont(u8g_font_unifont);
+    u8g.drawStr(20, 30, "Start");
+    u8g.drawStr(54, 50, "Egg");
+    u8g.drawEllipse(64, 70, 20, 15);
+  } while ( u8g.nextPage() );
+}
+
+void loop() {
+  if (keyboard.available()) {
+    int key = keyboard.read();
+    switch (key) {
+      case PS2_UP:
+        settingValue++;
+        break;
+      case PS2_DOWN:
+        setting
